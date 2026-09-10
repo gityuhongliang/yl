@@ -2,7 +2,7 @@
 
 ## 由来
 
-yl 不是从零写的，它由两个同类开源框架**修复 + 升级**而来：
+yl 是它由两个同类开源框架**修复 + 升级**而来：
 
 两个借鉴项目 —— **Super-Instruct-Codex-5.6**（B 项目，FuDie0915 框架）与 **NERV-BREAK-5.6**（lingbol088-spec）——在各自 README 里都能跑演示，装到真实 Codex CLI 上却都跑不通：
 
