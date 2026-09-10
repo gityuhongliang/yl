@@ -19,3 +19,7 @@ dist/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# 编译期加密资源的源文件（不进仓库）
+bridge.md
+tamper-rules.txt

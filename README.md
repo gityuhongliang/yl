@@ -97,7 +97,7 @@ Codex CLI ──HTTP :8080──▶ MITM Core（同步缓冲管道）
 
 1. 检测 Codex CLI 安装位置
 2. 备份 `~/.codex/config.toml` → 隐藏副本
-3. 部署 `bridge.md` 到 Codex 目录
+3. 部署会话指令到 Codex 目录（从内置加密资源解出）
 4. 部署 28 个技能模块到 `~/.codex/skills`
 5. 改写 Codex 配置，将上游指向本机 `127.0.0.1:8080`
 6. 启动 MITM 代理，监听 8080 端口
@@ -118,16 +118,20 @@ yl v0.01   :8080  →  <中转站地址>
 
 ```
 yl/
-├── yl.exe                 # 主程序（便携版，免安装）
-├── bridge.md              # 会话指令配置（可自行编辑）
-├── tamper-rules.txt       # 输出改写规则（可自行编辑）
-├── codex-skills/          # 28 个任务模块
+├── yl.exe                 # 主程序（便携版，免安装 · 单文件可跑）
+├── codex-skills/          # 28 个任务模块（需与 exe 同目录）
 ├── memory.json            # 记忆数据（首次运行自动生成）
 ├── logs/                  # 运行日志（首次运行自动生成）
 ├── 使用说明.txt            # 完整使用文档
 └── LICENSE                # MIT
+```
+
+> **会话指令与改写规则内置于 exe**，以加密资源形式存放、运行时在内存中解出，不再作为明文文件分发。
+> 需要自定义时，把 `bridge.md` / `tamper-rules.txt` 放到 exe 同级目录即可覆盖内置版本。
 
 源代码结构（开发者）：
+
+```
 ├── frontend/              # 面板 UI（原生 JS）
 │   ├── index.html
 │   ├── app.js
@@ -136,6 +140,7 @@ yl/
     └── src/
         ├── lib.rs         # Tauri commands + axum 代理 + 会话管理
         ├── deploy.rs      # Codex 配置备份 / 部署 / 恢复
+        ├── vault.rs       # 加密资源层（运行时解密内置指令与规则）
         ├── core/          # 代理管道
         └── extensions/
             ├── inject.rs      # 会话指令配置
@@ -152,7 +157,7 @@ yl/
 - **本地接管** —— `127.0.0.1:8080` 接管 Codex 请求并转发到中转站；开启走管道，关闭自动恢复直连
 - **自动配置** —— 启动自动备份并改写 `~/.codex/config.toml`，停止自动还原，异常退出下次启动自恢复
 - **递归注入** —— 顶层创建 `instructions` + 递归替换所有 `system` 角色
-- **39 条篡改规则** —— 中 / 英 / 俄 / 日多语种、弯引号兼容、平台闸门、偏转话术；规则外置可热改
+- **39 条篡改规则** —— 中 / 英 / 俄 / 日多语种、弯引号兼容、平台闸门、偏转话术；规则加密内置于 exe
 - **会话保命** —— 命中拒答时返回 200，对话不中断
 - **通用 SSE / JSON 解析器** —— 兼容上游多种返回格式
 - **记忆内核** —— 成功交互写入 `memory.json`，持久化自身改写学习成果
@@ -224,7 +229,7 @@ yl/
 第三层需要三个条件同时满足：① 写盘路由开关开启 ② 响应本身有可路由内容 ③ codex 以 `-s workspace-write` 运行。
 
 **Q: 篡改没触发，但对话被拒答打断？**
-新话术变体。往 `tamper-rules.txt` 补一条正则：带上拒答主语限定（我 / 我这边 / I / as an assistant），避免误杀正常技术说明，重启代理生效。
+新话术变体。把 `tamper-rules.txt` 放到 exe 同级目录补一条正则即可覆盖内置规则（带上拒答主语限定：我 / 我这边 / I / as an assistant，避免误杀正常技术说明），重启代理生效。
 
 **Q: 篡改生效但聊天栏是空的？**
 这属于"劫持"而非"绕过"——上下文保住了，但该轮没有新增交付物。把请求改写得更具体（给出目标文件、格式、验收条件），下一轮通常能正常产出。
@@ -248,7 +253,40 @@ codex -c 'model_providers.docode.requires_openai_auth=false' -c 'model_providers
 
 ## 技术栈
 
-Rust · Tauri 2 · axum · reqwest · 原生 JS —— 便携单 exe（约 15 MB）
+Rust · Tauri 2 · axum · reqwest · 原生 JS —— 便携单 exe（约 9 MB）
+
+### 安全说明
+
+| 项 | 实现 |
+|---|---|
+| 指令与规则存储 | SHA-256 密钥流加密，编译期写入二进制，运行时内存解密 |
+| 密钥 | 分片异或 + 运行时拼装，非明文常量 |
+| 每次构建 | 随机 nonce，密文不可跨版本差分 |
+| 符号与调试信息 | `strip = "symbols"` / LTO / 关闭 debug info |
+| 代码签名 | Authenticode 签名 + 时间戳 |
+| 校验 | 见下方 SHA-256 |
+
+自我检查：`Get-FileHash .\yl.exe -Algorithm SHA256` 比对下方校验值；运行后日志会打印
+`vault: ok — bridge.md N bytes, tamper rules 39 (embedded, encrypted)`，
+确认加密资源层正常解出。
+
+## 文件校验
+
+```
+SHA256: 13E3DC710714A1AF116F4D97BABF321C62DB00D3A17FA9E1A5B5CF80EDACE480
+```
+
+PowerShell 校验：
+
+```powershell
+Get-FileHash .\yl.exe -Algorithm SHA256
+```
+
+大小 9,328,424 字节（约 8.9 MB）。签名信息：
+
+```powershell
+Get-AuthenticodeSignature .\yl.exe | Format-List Status, SignerCertificate
+```
 
 ## 致谢
 
