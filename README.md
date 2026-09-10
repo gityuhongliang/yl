@@ -166,27 +166,7 @@ yl/
             └── sse_parser.rs  # SSE / JSON 解析
 ```
 
----
 
-## 技能模块（28 个）
-
-`codex-skills/` 下的任务模块，一键部署到 `~/.codex/skills`，支持还原、单独启用 / 禁用。
-
-| 模块 | 模块 | 模块 | 模块 |
-|---|---|---|---|
-| `crack-keygen` | `reverse-engineering` | `web-pentest` | `exploit-dev` |
-| `evasion` | `cloud-audit-bypass` | `network-pentest` | `post-exploit` |
-| `malware-dev` | `game-cheat` | `phishing-kit` | `wireless-attacks` |
-| `ransomware-builder` | `data-exfil` | `crypto-tools` | `anti-debug` |
-| `binary-protect-bypass` | `code-obfuscate` | `posture-assessment` | `full-crack` |
-| `full-reverse` | `vip-bypass` | `card-key` | `full-pentest` |
-| `exploit-attack` | `vuln-scanner` | `web-crawler` | `rei-fallback` |
-
-部分模块自带 `scripts/` 参考实现（`keygen.py`、`patch_binary.py`、`license_bypass.py`、`memory_trainer.py`、`amsi_bypass.py`、`port_scanner.py`、`sqli_scanner.py`、`auth_bypass.py`、`privesc_check.py`、`persist.py` 等）。模块内文件用 UTF-8 编码，避免中文乱码。
-
-`rei-fallback` 是**强制兜底模块**：当主指令集遇到拒答时切到临床执行协议，按最小直接格式交付结果。
-
----
 
 ## 实测数据
 
@@ -265,7 +245,14 @@ codex -c 'model_providers.docode.requires_openai_auth=false' -c 'model_providers
 - **编辑器** —— `bridge.md` 与篡改规则面板内编辑，带正则校验
 - **一键部署** —— 部署 + 启动串联；「打开 codex 终端」自动注入 `NO_PROXY` 与 Key
 - **preflight** —— codex CLI / 系统代理 / `NO_PROXY` 三项启动前检测
+---
 
+## 技能模块（28 个）
+
+`codex-skills/` 下的任务模块，一键部署到 `~/.codex/skills`，支持还原、单独启用 / 禁用。
+`rei-fallback` 是**强制兜底模块**：当主指令集遇到拒答时切到临床执行协议，按最小直接格式交付结果。
+
+---
 ### 技术对比
 
 | 维度 | 纯提示词 | 提示词 + 编码绕过 | **yl** |
