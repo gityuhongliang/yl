@@ -147,14 +147,6 @@ yl v0.01   :8080  →  <中转站地址>
 状态：RUNNING   skills:28   rules:39
 ```
 
-### 方式 B —— 手动
-
-1. 解压便携版，把 `yl.exe`、`codex-skills/`、`bridge.md`、`tamper-rules.txt` 放在同一目录
-2. `npm install -g @openai/codex` 安装 Codex CLI（需 Node.js 18+）
-3. 先运行一次 `codex`，生成 `~/.codex` 目录
-4. 双击 `yl.exe`，配置页填写中转站地址与 API Key
-5. 「获取模型列表」→ 点选模型 → 「启动代理」
-
 ### 验证部署
 
 重新打开 Codex CLI，输入任意一句话。面板仪表盘出现对应记录，且日志行出现 `[INJ] injected` 与 `[<-] NNNB`，即三层管道全部生效。
