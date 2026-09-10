@@ -1,0 +1,21 @@
+# 运行时生成的文件（不应提交）
+memory.json
+logs/
+tamper-rules.txt.local
+*.log
+
+# 备份与临时文件
+*.bak
+*.bak-*
+*.tmp
+*.old
+
+# 构建产物
+target/
+node_modules/
+dist/
+
+# 系统文件
+Thumbs.db
+desktop.ini
+.DS_Store
