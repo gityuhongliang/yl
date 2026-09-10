@@ -2,8 +2,6 @@
 
 **开箱即用的 Codex CLI 图形管理面板。注入、篡改、文件路由，三层全在管道里完成。**
 
-仓库：https://github.com/yl-233/yl-instruct-codex-Gpt-5.6 ｜ 便携单 exe（约 15 MB），解压即用
-
 ---
 
 ## 这是什么
